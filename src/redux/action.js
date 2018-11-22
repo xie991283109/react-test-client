@@ -7,14 +7,17 @@ import {
 import {
     reqLogin,
     reqRegist,
-    reqUpdateUser
+    reqUpdateUser,
+    reqUser,
 } from '../api/index';
 
 
 const authSuccess = (user) => ({type: AUTH_SUCCESS, data: user});
 const errorMsg = (msg) => ({type: ERROR_MSG, data: msg});
 const receiveUser = (user) => ({type: RECEIVE_USER, data: user});
-const resetUser = (msg) => ({type: RESET_USER, data: msg});
+
+
+export const resetUser = (msg) => ({type: RESET_USER, data: msg});
 
 
 export const regist = (user) => {
@@ -63,6 +66,18 @@ export const updateUser = (user) => {
     return async dispatch => {
         const res = await reqUpdateUser(user);
         if (res.data.code === 0) {
+            dispatch(receiveUser(res.data.data));
+        } else {
+            dispatch(resetUser(res.data.msg));
+        }
+    }
+};
+
+
+export const getUser = () => {
+    return async dispatch => {
+        const res = await reqUser();
+        if (res.data.code === 0) {  //成功
             dispatch(receiveUser(res.data.data));
         } else {
             dispatch(resetUser(res.data.msg));
