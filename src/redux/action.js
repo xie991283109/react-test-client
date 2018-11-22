@@ -3,12 +3,14 @@ import {
     ERROR_MSG,
     RECEIVE_USER,
     RESET_USER,
+    RECEIVE_USER_LIST,
 } from './action-types';
 import {
     reqLogin,
     reqRegist,
     reqUpdateUser,
     reqUser,
+    reqUserList,
 } from '../api/index';
 
 
@@ -18,6 +20,9 @@ const receiveUser = (user) => ({type: RECEIVE_USER, data: user});
 
 
 export const resetUser = (msg) => ({type: RESET_USER, data: msg});
+
+
+const receiveuserList = (userlist) => ({type: RECEIVE_USER_LIST, data: userlist});
 
 
 export const regist = (user) => {
@@ -81,6 +86,16 @@ export const getUser = () => {
             dispatch(receiveUser(res.data.data));
         } else {
             dispatch(resetUser(res.data.msg));
+        }
+    }
+};
+
+
+export const getUserList = (type) => {
+    return async dispatch => {
+        const res = await reqUserList(type);
+        if (res.data.code === 0) {
+            dispatch(receiveuserList(res.data.data))
         }
     }
 };

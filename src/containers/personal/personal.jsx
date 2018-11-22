@@ -28,7 +28,7 @@ class Personal extends Component {
     render() {
         const {username, info, header, company, post, salary} = this.props.user;
         return (
-            <div>
+            <div style={{marginTop: 45}}>
                 <Result
                     img={<img src={require(`../../assets/images/${header}.png`)} style={{width: 50}}/>}
                     title={username}

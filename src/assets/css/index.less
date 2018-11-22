@@ -5,8 +5,16 @@
 }
 
 .am-tab-bar { //tabbar始终在底部显示
+    z-index: 2;
     position: fixed;
     bottom: 0;
     width: 100%;
     height: inherit;
+}
+
+.stick-top { //navbar始终在顶部显示
+    z-index: 9;
+    position: fixed;
+    top: 0;
+    width: 100%;
 }
