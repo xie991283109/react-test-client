@@ -4,6 +4,8 @@ import {
     RECEIVE_USER,
     RESET_USER,
     RECEIVE_USER_LIST,
+    RECEIVE_MSG_LIST,
+    RECEIVE_MSG,
 } from './action-types';
 import {
     reqLogin,
@@ -11,18 +13,40 @@ import {
     reqUpdateUser,
     reqUser,
     reqUserList,
+    reqMsgList,
+    reqReadMsg,
 } from '../api/index';
-
+import io from 'socket.io-client';
 
 const authSuccess = (user) => ({type: AUTH_SUCCESS, data: user});
 const errorMsg = (msg) => ({type: ERROR_MSG, data: msg});
 const receiveUser = (user) => ({type: RECEIVE_USER, data: user});
+const receiveuserList = (userlist) => ({type: RECEIVE_USER_LIST, data: userlist});
+const receiveMsgList = ({users, chatMsgs}) => ({type: RECEIVE_MSG_LIST, data: {users, chatMsgs}});
+
+
+function initIO() {
+    if (!io.socket) {  //创建单例对象
+        io.socket = io('ws://localhost:4000');
+        io.socket.on('receiveMsg', function (chatMsg) {
+            console.log('客户端接收服务器发送的消息', chatMsg)
+        })
+    }
+}
+
+
+async function getMsgList(dispatch) {  //异步获取消息列表
+    initIO();
+    const res = await reqMsgList();
+    if (res.data.code === 0) {
+        console.log(res.data.data);
+        const {users, chatMsgs} = res.data.data;
+        dispatch(receiveMsgList({users, chatMsgs}));
+    }
+}
 
 
 export const resetUser = (msg) => ({type: RESET_USER, data: msg});
-
-
-const receiveuserList = (userlist) => ({type: RECEIVE_USER_LIST, data: userlist});
 
 
 export const regist = (user) => {
@@ -39,6 +63,7 @@ export const regist = (user) => {
         return async dispatch => {
             const res = await reqRegist({username, password, type});
             if (res.data.code === 0) {
+                getMsgList(dispatch);
                 dispatch(authSuccess(res.data.data));
             } else {
                 dispatch(errorMsg(res.data.msg));
@@ -58,6 +83,7 @@ export const login = (user) => {
         return async dispatch => {
             const res = await reqLogin(user);
             if (res.data.code === 0) {
+                getMsgList(dispatch);
                 dispatch(authSuccess(res.data.data));
             } else {
                 dispatch(errorMsg(res.data.msg));
@@ -71,6 +97,7 @@ export const updateUser = (user) => {
     return async dispatch => {
         const res = await reqUpdateUser(user);
         if (res.data.code === 0) {
+            getMsgList(dispatch);
             dispatch(receiveUser(res.data.data));
         } else {
             dispatch(resetUser(res.data.msg));
@@ -83,6 +110,7 @@ export const getUser = () => {
     return async dispatch => {
         const res = await reqUser();
         if (res.data.code === 0) {  //成功
+            getMsgList(dispatch);
             dispatch(receiveUser(res.data.data));
         } else {
             dispatch(resetUser(res.data.msg));
@@ -97,5 +125,13 @@ export const getUserList = (type) => {
         if (res.data.code === 0) {
             dispatch(receiveuserList(res.data.data))
         }
+    }
+};
+
+
+export const sendMsg = ({from, to, content}) => {
+    return async dispatch => {
+        console.log('发送消息', {from, to, content});
+        io.socket.emit('sendMsg', {from, to, content})
     }
 };

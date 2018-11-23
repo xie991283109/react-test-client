@@ -5,6 +5,8 @@ import {
     RECEIVE_USER,
     RESET_USER,
     RECEIVE_USER_LIST,
+    RECEIVE_MSG_LIST,
+    RECEIVE_MSG,
 } from './action-types';
 
 import {getRedirectTo} from '../utils';
@@ -15,7 +17,6 @@ const initUser = {
     msg: '', // 错误提示信息
     redirectTo: '' // 需要自动跳转的路由path
 };
-
 
 function user(state = initUser, action) {
     switch (action.type) {
@@ -45,8 +46,28 @@ function userList(state = initUserList, action) {
     }
 }
 
+
+const initChat = {
+    users: {},
+    chatMsgs: [],
+    unReadCount: 0
+};
+
+function chat(state = initChat, action) {
+    switch (action.type) {
+        case RECEIVE_MSG_LIST:
+            const {users, chatMsgs} = action.data;
+            return {users, chatMsgs, unReadCount: 0};
+        case RECEIVE_MSG:
+            return;
+        default:
+            return state;
+    }
+}
+
 // 返回合并的reducer
 export default combineReducers({
     user,
-    userList
+    userList,
+    chat
 })
