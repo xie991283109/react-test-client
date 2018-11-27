@@ -8,7 +8,7 @@ import {
     Icon,
 } from 'antd-mobile';
 
-import {sendMsg} from '../../redux/action';
+import {sendMsg, readMsg} from '../../redux/action';
 
 const Item = List.Item;
 
@@ -25,6 +25,11 @@ class Chat extends Component {
 
     componentDidMount() {  //初始时滑到底部
         window.scrollTo(0, document.body.scrollHeight);
+
+        //发请求更新未读数量
+        const targetId = this.props.match.params.userid;
+        const myId = this.props.user._id;
+        this.props.readMsg(targetId, myId);
     }
 
     componentDidUpdate() {  //更新对话时滑到底部
@@ -125,5 +130,5 @@ class Chat extends Component {
 
 export default connect(
     state => ({user: state.user, chat: state.chat}),
-    {sendMsg}
+    {sendMsg, readMsg}
 )(Chat)

@@ -6,6 +6,7 @@ import {
     RECEIVE_USER_LIST,
     RECEIVE_MSG_LIST,
     RECEIVE_MSG,
+    MSG_READ,
 } from './action-types';
 import {
     reqLogin,
@@ -22,8 +23,9 @@ const authSuccess = (user) => ({type: AUTH_SUCCESS, data: user});
 const errorMsg = (msg) => ({type: ERROR_MSG, data: msg});
 const receiveUser = (user) => ({type: RECEIVE_USER, data: user});
 const receiveuserList = (userlist) => ({type: RECEIVE_USER_LIST, data: userlist});
-const receiveMsgList = ({users, chatMsgs}) => ({type: RECEIVE_MSG_LIST, data: {users, chatMsgs}});
-const receiveMsg = (chatData) => ({type: RECEIVE_MSG, data: chatData});
+const receiveMsgList = ({users, chatMsgs, userid}) => ({type: RECEIVE_MSG_LIST, data: {users, chatMsgs, userid}});
+const receiveMsg = (chatData, userid) => ({type: RECEIVE_MSG, data: {chatData, userid}});
+const msgRead = (count, from, to) => ({type: MSG_READ, data: {count, from, to}});
 
 function initIO(dispatch, userid) {  //初始化socket.io
     if (!io.socket) {  //创建单例对象
@@ -32,7 +34,7 @@ function initIO(dispatch, userid) {  //初始化socket.io
             // console.log('客户端接收服务器发送的消息', chatMsg);
             //只有chatMsg是与当前用户相关的信息，采取同步分发action
             if (userid === chatMsg.from || userid === chatMsg.to) {
-                dispatch(receiveMsg(chatMsg));
+                dispatch(receiveMsg(chatMsg, userid));
             }
         })
     }
@@ -44,7 +46,7 @@ async function getMsgList(dispatch, userid) {  //异步获取消息列表
     const res = await reqMsgList();
     if (res.data.code === 0) {
         const {users, chatMsgs} = res.data.data;
-        dispatch(receiveMsgList({users, chatMsgs}));
+        dispatch(receiveMsgList({users, chatMsgs, userid}));
     }
 }
 
@@ -136,5 +138,16 @@ export const sendMsg = ({from, to, content}) => {
     return async dispatch => {
         console.log('发送消息', {from, to, content});
         io.socket.emit('sendMsg', {from, to, content})
+    }
+};
+
+
+export const readMsg = (targetId, myId) => {
+    return async dispatch => {
+        const res = await reqReadMsg(targetId);
+        if (res.data.code === 0) {
+            const count = res.data.data;
+            dispatch(msgRead({count, targetId, myId}))
+        }
     }
 };
