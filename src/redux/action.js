@@ -25,7 +25,8 @@ const receiveUser = (user) => ({type: RECEIVE_USER, data: user});
 const receiveuserList = (userlist) => ({type: RECEIVE_USER_LIST, data: userlist});
 const receiveMsgList = ({users, chatMsgs, userid}) => ({type: RECEIVE_MSG_LIST, data: {users, chatMsgs, userid}});
 const receiveMsg = (chatData, userid) => ({type: RECEIVE_MSG, data: {chatData, userid}});
-const msgRead = (count, from, to) => ({type: MSG_READ, data: {count, from, to}});
+const msgRead = ({count, from, to}) => ({type: MSG_READ, data: {count, from, to}});
+
 
 function initIO(dispatch, userid) {  //初始化socket.io
     if (!io.socket) {  //创建单例对象

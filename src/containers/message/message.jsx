@@ -21,11 +21,11 @@ class Message extends Component {
             if (!lastMsg) {
                 lastMsgsObj[chatId] = msg;
             } else {
-                const unReadCount = lastMsg.unReadCount;
+                const unReadCount = lastMsg.unReadCount + msg.unReadCount;
                 if (msg.create_time > lastMsg.create_time) {
                     lastMsgsObj[chatId] = msg;
                 }
-                lastMsgsObj[chatId].unReadCount = unReadCount + msg.unReadCount;
+                lastMsgsObj[chatId].unReadCount = unReadCount;
             }
         });
 

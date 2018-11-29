@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import QueueAnim from 'rc-queue-anim';
 
 import UserList from '../../components/user-list/user-list';
 
@@ -14,10 +15,11 @@ class Dashen extends Component {
         const {userList} = this.props;
         return (
             <div style={{marginBottom: 50, marginTop: 45}}>
-                {
-                    userList.map((user, index) => <UserList key={index} user={user}/>)
-                }
-
+                <QueueAnim type='scale'>
+                    {
+                        userList.map((user, index) => <UserList key={index} user={user}/>)
+                    }
+                </QueueAnim>
             </div>
         );
     }

@@ -7,6 +7,7 @@ import {
     Grid,
     Icon,
 } from 'antd-mobile';
+import QueueAnim from 'rc-queue-anim';
 
 import {sendMsg, readMsg} from '../../redux/action';
 
@@ -26,6 +27,13 @@ class Chat extends Component {
     componentDidMount() {  //初始时滑到底部
         window.scrollTo(0, document.body.scrollHeight);
 
+        //发请求更新未读数量
+        const targetId = this.props.match.params.userid;
+        const myId = this.props.user._id;
+        this.props.readMsg(targetId, myId);
+    }
+
+    componentWillUnmount() {  //在推出之前更新未读数
         //发请求更新未读数量
         const targetId = this.props.match.params.userid;
         const myId = this.props.user._id;
@@ -81,18 +89,20 @@ class Chat extends Component {
                     {users[targetId].username}
                 </NavBar>
                 <List style={{marginTop: 50, marginBottom: 50}}>
-                    {
-                        msgs.map((msg, index) => {
-                            if (myid === msg.to) {
-                                return <Item key={index} thumb={require(`../../assets/images/${users[myid].header}.png`)}>{msg.content}</Item>
-                            } else {
-                                return <Item
-                                    key={index}
-                                    className='chat-me'
-                                    extra={<img src={require(`../../assets/images/${users[targetId].header}.png`)}/>}>{msg.content}</Item>
-                            }
-                        })
-                    }
+                    <QueueAnim type='left'>
+                        {
+                            msgs.map((msg, index) => {
+                                if (myid === msg.to) {
+                                    return <Item key={index} thumb={require(`../../assets/images/${users[myid].header}.png`)}>{msg.content}</Item>
+                                } else {
+                                    return <Item
+                                        key={index}
+                                        className='chat-me'
+                                        extra={<img src={require(`../../assets/images/${users[targetId].header}.png`)}/>}>{msg.content}</Item>
+                                }
+                            })
+                        }
+                    </QueueAnim>
                 </List>
                 <div className='am-tab-bar'>
                     <InputItem
