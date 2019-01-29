@@ -21,7 +21,7 @@ class Login extends Component {
         password: '',
     };
 
-    handleChange = (type, val) => {  //根据输入内容，更新state
+    handleChange = (type, val) => {  //根据输入的内容，更新state
         this.setState({
             [type]: val
         })
